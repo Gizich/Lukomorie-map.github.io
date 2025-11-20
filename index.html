@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Лукоморье Навигация</title>
+    <style>
+        /* --- 1. ОБЩИЕ НАСТРОЙКИ --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8f9fa;
+            height: 100vh; /* Фиксируем высоту приложения */
+            overflow: hidden; /* Запрещаем скролл самого тела, скроллим внутри блоков */
+        }
+
+        /* --- 2. ЭКРАН МЕНЮ (Плитка) --- */
+        #menu-screen {
+            height: 100%;
+            overflow-y: auto; /* Скролл только внутри меню */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { margin: 0; color: #166534; font-size: 24px; }
+        .header p { margin: 5px 0 0; color: #666; font-size: 14px; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding-bottom: 80px; /* Отступ снизу, чтобы удобно листать */
+        }
+
+        @media (min-width: 600px) {
+            .grid-container { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        .house-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            flex-direction: column;
+        }
+        .house-card:active { transform: scale(0.96); }
+
+        .card-image {
+            width: 100%;
+            height: 120px;
+            background-color: #e2e8f0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-title {
+            padding: 12px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        /* --- 3. ЭКРАН КАРТЫ (ИСПРАВЛЕНО) --- */
+        #map-screen {
+            display: none; /* Скрыто по умолчанию */
+            
+            /* ФИШКА 1: Карта занимает весь экран */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #a8c0b0;
+            z-index: 1000;
+            
+            /* ФИШКА 2: Центрирование карты */
+            justify-content: center;
+            align-items: center;
+            
+            /* ФИШКА 3: Разрешаем скролл, если при зуме карта вылезла за края */
+            overflow: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Кнопка НАЗАД */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000; /* Поверх всего */
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* КОНТЕЙНЕР SVG */
+        .map-wrapper {
+            /* ФИШКА 4: Заставляем карту быть высотой с экран */
+            height: 100vh; 
+            width: auto;   /* Ширина подстроится автоматически */
+            
+            /* Гарантия, что она не станет меньше экрана */
+            min-height: 100vh; 
+            
+            display: flex;
+            justify-content: center;
+        }
+
+        svg {
+            display: block;
+            /* ФИШКА 5: SVG наследует высоту контейнера (100% экрана) */
+            height: 100%; 
+            width: auto;  /* Пропорции сохраняются */
+        }
+
+        /* --- 4. СТИЛИ МАРШРУТОВ И ДОМОВ --- */
+        path[id^="route_"] {
+            fill: none;
+            stroke: white;
+            stroke-width: 20;
+            opacity: 0.4;
+            stroke-linecap: round;
+            transition: opacity 0.3s;
+        }
+
+        path[id^="route_"].active-route {
+            stroke: #ff4757;
+            opacity: 1;
+            stroke-dasharray: 4000;
+            stroke-dashoffset: 4000;
+            animation: drawRoute 2s forwards ease-out;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+        }
+
+        rect[id^="house_"] {
+            fill: #22c55e;
+            stroke: white;
+            stroke-width: 3;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+            transition: fill 0.3s;
+        }
+        
+        rect[id^="house_"].active-house {
+            fill: #ff4757;
+        }
+
+        @keyframes drawRoute {
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu-screen">
+        <div class="header">
+            <h1>Лукоморье</h1>
+            <p>Куда поедем?</p>
+        </div>
+        <div class="grid-container" id="cards-container"></div>
+    </div>
+
+    <div id="map-screen">
+        <button class="back-btn" onclick="showMenu()">← Меню</button>
+        
+        <div class="map-wrapper">
+            <svg viewBox="0 0 1392 2480" xmlns="http://www.w3.org/2000/svg">
+                
+                <image href="map.jpg" x="0" y="0" width="1392" height="2480" />
+
+                <g id="Layer_1">
+                    <path id="route_house_Solenka" d="M1079.5 2227.5V2183L1055.5 2123.5C1052.67 2085.5 1047 2008.4 1047 2004C1047 1999.6 1038.67 1974.17 1034.5 1962L901.5 1936L689 1912L485 1890.5C478.5 1881 466.1 1861.2 468.5 1858C470.9 1854.8 460.5 1809.67 455 1787.5L434 1744.5V1712.5H455" />
+                    <path id="route_house_Emelia" d="M1080.5 2229.5V2183C1072.5 2171.33 1056.3 2143.9 1055.5 2127.5C1054.7 2111.1 1048.83 2038.33 1046 2004C1051.83 1993 1065.2 1970.1 1072 1966.5C1078.8 1962.9 1120.17 1831.67 1140 1766.5L1167 1714.5L1175 1656L1153.5 1582L1096 1504L1090 1479L1104.5 1374L1057.5 1365.5L1027.5 1379L989 1412.5L972.5 1463.5L986 1474" />
+                    
+                    <rect id="house_Administracia" x="1046" y="2200" width="27" height="55" />
+                    <rect id="house_Emelia" x="978" y="1460" width="29" height="28" />
+                    <rect id="house_Solenka" x="441" y="1690" width="29" height="27" />
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        // --- НАСТРОЙКИ ---
+        const houses = [
+            { name: "Емеля", id: "house_Emelia", route: "route_house_Emelia", img: "" },
+            { name: "Соленка", id: "house_Solenka", route: "route_house_Solenka", img: "" },
+            { name: "Администрация", id: "house_Administracia", route: null, img: "" }
+        ];
+
+        // --- ЛОГИКА ---
+        const menuScreen = document.getElementById('menu-screen');
+        const mapScreen = document.getElementById('map-screen');
+        const cardsContainer = document.getElementById('cards-container');
+
+        // Генерация меню
+        houses.forEach(house => {
+            const card = document.createElement('div');
+            card.className = 'house-card';
+            const bgStyle = house.img ? `background-image: url('${house.img}')` : 'background-color: #cbd5e1';
+            
+            card.innerHTML = `<div class="card-image" style="${bgStyle}"></div><div class="card-title">${house.name}</div>`;
+            card.onclick = () => openMap(house);
+            cardsContainer.appendChild(card);
+        });
+
+        function openMap(houseData) {
+            menuScreen.style.display = 'none';
+            
+            // Используем flex, чтобы отцентрировать карту
+            mapScreen.style.display = 'flex'; 
+
+            // Сброс
+            document.querySelectorAll('.active-route').forEach(el => el.classList.remove('active-route'));
+            document.querySelectorAll('.active-house').forEach(el => el.classList.remove('active-house'));
+
+            // Активация
+            if (houseData.route) {
+                const routeEl = document.getElementById(houseData.route);
+                if (routeEl) routeEl.classList.add('active-route');
+            }
+            const houseEl = document.getElementById(houseData.id);
+            if (houseEl) {
+                houseEl.classList.add('active-house');
+                // Убираем авто-скролл, так как карта теперь целиком на экране
+                // Но если пользователь зумит, он сам найдет домик
+            }
+        }
+
+        function showMenu() {
+            mapScreen.style.display = 'none';
+            menuScreen.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
