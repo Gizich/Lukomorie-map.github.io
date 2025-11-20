@@ -200,9 +200,26 @@
     <script>
         // --- НАСТРОЙКИ ---
         const houses = [
-            { name: "Емеля", id: "house_Emelia", route: "route_house_Emelia", img: "" },
-            { name: "Соленка", id: "house_Solenka", route: "route_house_Solenka", img: "" },
-            { name: "Администрация", id: "house_Administracia", route: null, img: "" }
+            { 
+                name: "Емеля", 
+                id: "house_Emelia", 
+                route: "route_house_Emelia", 
+                // Указываем путь к папке images
+                img: "images/emelya.jpg" 
+            },
+            { 
+                name: "Соленка", 
+                id: "house_Solenka", 
+                route: "route_house_Solenka", 
+                img: "images/solenka.jpg" 
+            },
+            { 
+                name: "Администрация", 
+                id: "house_Administracia", 
+                route: null, 
+                // Если фото нет, оставляем пустым, будет серая заглушка
+                img: "" 
+            }
         ];
 
         // --- ЛОГИКА ---
@@ -250,4 +267,5 @@
         }
     </script>
 </body>
+
 </html>
