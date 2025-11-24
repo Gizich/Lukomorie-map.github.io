@@ -39,7 +39,7 @@ function success(pos) {
 
     if (isOutOfBounds(crd.latitude, crd.longitude)) {
         if (!isAlertShown) {
-            alert("Вы находитесь за пределами территории базы.");
+            alert("Вы находитесь за пределами территории Лукоморья.");
             isAlertShown = true;
         }
         // Если кнопка доступна (таймер не идет), пишем статус
