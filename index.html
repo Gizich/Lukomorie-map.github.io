@@ -35,7 +35,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            padding-bottom: 80px;
+            padding-bottom: 100px; /* Увеличили отступ, чтобы кнопка звонка не перекрывала контент */
         }
 
         @media (min-width: 600px) {
@@ -56,7 +56,6 @@
 
         .card-image {
             width: 100%;
-            /* ИСПРАВЛЕНИЕ: Автоматический расчет высоты 4:3 */
             aspect-ratio: 4 / 3; 
             background-color: #e2e8f0;
             background-size: cover;
@@ -74,7 +73,6 @@
         /* --- 3. ЭКРАН КАРТЫ --- */
         #map-screen {
             display: none;
-            /* СТАБИЛЬНАЯ ВЕРСИЯ CSS */
             position: fixed; 
             top: 0;
             left: 0;
@@ -106,8 +104,39 @@
             gap: 5px;
         }
 
+        /* НОВАЯ КНОПКА ЗВОНКА */
+        .call-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #16a34a; /* Зеленый цвет */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 30px;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(22, 163, 74, 0.4);
+            z-index: 3000; /* Поверх всего */
+            transition: transform 0.2s, background-color 0.2s;
+            animation: pulse 2s infinite; /* Легкая пульсация */
+        }
+        
+        .call-btn:active {
+            transform: scale(0.9);
+            background-color: #15803d;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+        }
+
         .map-wrapper {
-            /* СТАБИЛЬНАЯ ВЕРСИЯ CSS */
             height: 100vh;
             width: auto;
             min-height: 100vh;
@@ -121,12 +150,12 @@
             width: auto;
         }
 
-        /* --- 4. СТИЛИ SVG (Красота маршрутов) --- */
+        /* --- 4. СТИЛИ SVG --- */
         path[id^="route_"] {
             fill: none;
             stroke: white;
             stroke-width: 20;
-            opacity: 0; /* ИСПРАВЛЕНИЕ: Линии полностью невидимы */
+            opacity: 0; 
             stroke-linecap: round;
             transition: opacity 0.3s;
         }
@@ -136,7 +165,7 @@
             opacity: 1;
             stroke-dasharray: 4000;
             stroke-dashoffset: 4000;
-            animation: drawRoute 12s forwards ease-out; /* ИСПРАВЛЕНИЕ: Скорость 12 секунд */
+            animation: drawRoute 12s forwards ease-out; 
             filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
         }
 
@@ -158,6 +187,10 @@
     </style>
 </head>
 <body>
+
+    <a href="tel:+79272368626" class="call-btn" title="Позвонить администратору">
+        📞
+    </a>
 
     <div id="menu-screen">
         <div class="header">
@@ -199,7 +232,7 @@
     </div>
 
     <script>
-        // --- НАСТРОЙКИ (Со всеми домиками) ---
+        // --- НАСТРОЙКИ ---
         const houses = [
             { name: "Емеля", id: "house_Emelia", route: "route_house_Emelia", img: "images/image_Emelia.jpg" },
             { name: "Соленка", id: "house_Solenka", route: "route_house_Solenka", img: "images/solenka.jpg" },
