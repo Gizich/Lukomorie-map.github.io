@@ -10,8 +10,9 @@ const mX = (GPS_CONSTANTS.xB - GPS_CONSTANTS.xA) / (GPS_CONSTANTS.LonB - GPS_CON
 const mY = (GPS_CONSTANTS.yB - GPS_CONSTANTS.yA) / (GPS_CONSTANTS.LatB - GPS_CONSTANTS.LatA);
 
 let locationPin;
-// Флаг, чтобы не спамить уведомлениями каждую секунду
-let isAlertShown = false; 
+let isAlertShown = false;
+let watchId = null; // ID процесса слежения
+let cooldownTimer = null; // ID таймера
 
 function gpsToSvg(lat, lon) {
     const x = mX * (lon - GPS_CONSTANTS.LonA) + GPS_CONSTANTS.xA;
@@ -19,15 +20,12 @@ function gpsToSvg(lat, lon) {
     return { x, y };
 }
 
-// Проверка: находится ли точка внутри границ карты
 function isOutOfBounds(lat, lon) {
-    // Определяем границы (мин/макс широта и долгота)
     const minLat = Math.min(GPS_CONSTANTS.LatA, GPS_CONSTANTS.LatB);
     const maxLat = Math.max(GPS_CONSTANTS.LatA, GPS_CONSTANTS.LatB);
     const minLon = Math.min(GPS_CONSTANTS.LonA, GPS_CONSTANTS.LonB);
     const maxLon = Math.max(GPS_CONSTANTS.LonA, GPS_CONSTANTS.LonB);
 
-    // Если текущая точка за пределами этих рамок
     if (lat < minLat || lat > maxLat || lon < minLon || lon > maxLon) {
         return true;
     }
@@ -39,26 +37,27 @@ function success(pos) {
     const btn = document.querySelector('.location-btn');
     locationPin = document.getElementById('user-location-pin');
 
-    // 1. Проверяем, на территории ли клиент
     if (isOutOfBounds(crd.latitude, crd.longitude)) {
         if (!isAlertShown) {
-            alert("Вы находитесь за пределами территории базы. Маркер может быть не виден.");
-            isAlertShown = true; // Больше не показываем алерт в этом сеансе
+            alert("Вы находитесь за пределами территории базы.");
+            isAlertShown = true;
         }
-        if(btn) btn.innerText = '📍 Вы далеко';
-        // Мы все равно можем обновить маркер, но он улетит за границу видимости
+        // Если кнопка доступна (таймер не идет), пишем статус
+        if (btn && !btn.disabled) {
+             btn.innerText = '📍 Вы далеко';
+        }
     } else {
-        if(btn) btn.innerText = '🛰️ Вы найдены!';
+        if (btn && !btn.disabled) {
+             btn.innerText = '🛰️ Вы найдены!';
+        }
     }
 
-    // 2. Обновляем маркер
     const { x, y } = gpsToSvg(crd.latitude, crd.longitude);
     if (locationPin) {
         locationPin.setAttribute('cx', x);
         locationPin.setAttribute('cy', y);
         locationPin.style.opacity = 1; 
         
-        // Скроллим к маркеру только если он ВНУТРИ карты (иначе скролл улетит в пустоту)
         if (!isOutOfBounds(crd.latitude, crd.longitude)) {
              locationPin.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
         }
@@ -66,20 +65,54 @@ function success(pos) {
 }
 
 function error(err) {
-    console.warn(`ERROR(${err.code}): ${err.message}`);
-    alert("Не удалось определить местоположение. Разрешите доступ к геолокации.");
+    console.warn(`GPS ERROR(${err.code}): ${err.message}`);
+    if (err.code === 1) {
+        alert("Доступ к геолокации запрещен.");
+    }
+}
+
+function startCooldown(seconds) {
+    const btn = document.querySelector('.location-btn');
+    if (!btn) return;
+
+    let timeLeft = seconds;
+    btn.disabled = true;
+    btn.innerText = `Ждите ${timeLeft}с...`;
+
+    if (cooldownTimer) clearInterval(cooldownTimer);
+
+    cooldownTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(cooldownTimer);
+            btn.disabled = false;
+            btn.innerText = "📍 Обновить"; 
+        } else {
+            btn.innerText = `Ждите ${timeLeft}с...`;
+        }
+    }, 1000);
 }
 
 function startGeolocationTracking() {
+    const btn = document.querySelector('.location-btn');
+
     if (!navigator.geolocation) {
         alert('Ваш браузер не поддерживает GPS.');
         return;
     }
 
-    const btn = document.querySelector('.location-btn');
-    if(btn) btn.innerText = '📡 Поиск...';
+    // --- ВАЖНОЕ ИСПРАВЛЕНИЕ: Сбрасываем флаг уведомления при новом запуске ---
+    isAlertShown = false; 
 
-    navigator.geolocation.watchPosition(success, error, {
+    // Сброс предыдущего поиска
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+
+    startCooldown(20);
+
+    watchId = navigator.geolocation.watchPosition(success, error, {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0

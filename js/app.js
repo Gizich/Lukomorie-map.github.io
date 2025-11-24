@@ -5,34 +5,40 @@ const cardsContainer = document.getElementById('cards-container');
 
 // 1. Инициализация (Генерация меню)
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof houses === 'undefined') {
-        console.error('Ошибка: Файл data.js не загружен или пуст.');
+    // Проверяем, загрузились ли данные (поддержка и window.houses и просто houses)
+    const housesData = (typeof window.houses !== 'undefined') ? window.houses : (typeof houses !== 'undefined' ? houses : []);
+
+    if (housesData.length === 0) {
+        console.error('Ошибка: Данные о домиках не найдены.');
         return;
     }
 
-    // --- ЛОГИКА СОРТИРОВКИ ---
-    // 1. Находим Администрацию
-    const adminHouse = houses.find(h => h.id === 'house_Administracia');
-    
-    // 2. Берем всех остальных
-    let otherHouses = houses.filter(h => h.id !== 'house_Administracia');
-    
-    // 3. Сортируем остальных по алфавиту (по имени)
+    // Сортировка: Администрация первая, остальные по алфавиту
+    const adminHouse = housesData.find(h => h.id === 'house_Administracia');
+    let otherHouses = housesData.filter(h => h.id !== 'house_Administracia');
     otherHouses.sort((a, b) => a.name.localeCompare(b.name));
-
-    // 4. Собираем новый список: Администрация первая, потом остальные
+    
     const sortedHouses = [];
     if (adminHouse) sortedHouses.push(adminHouse);
     sortedHouses.push(...otherHouses);
 
-    // --- ОТРИСОВКА ---
+    // Создание карточек
     sortedHouses.forEach(house => {
         const card = document.createElement('div');
         card.className = 'house-card';
         const bgStyle = house.img ? `background-image: url('${house.img}')` : 'background-color: #cbd5e1';
 
         card.innerHTML = `<div class="card-image" style="${bgStyle}"></div><div class="card-title">${house.name}</div>`;
-        card.onclick = () => openMap(house);
+        
+        card.onclick = () => {
+            // --- НОВОЕ: Отправка аналитики ---
+            if (typeof trackEvent === 'function') {
+                trackEvent('select_' + house.id); 
+            }
+            // ---------------------------------
+            openMap(house);
+        };
+        
         cardsContainer.appendChild(card);
     });
 });
@@ -46,6 +52,18 @@ function openMap(houseData) {
     document.querySelectorAll('.active-route').forEach(el => el.classList.remove('active-route'));
     document.querySelectorAll('.active-house').forEach(el => el.classList.remove('active-house'));
 
+    // Гарантируем жесткую высоту (чтобы не было белого экрана)
+    const mapWrapper = document.querySelector('.map-wrapper');
+    if (mapWrapper) {
+        mapWrapper.style.height = '100vh'; 
+        mapWrapper.style.minHeight = '100vh';
+    }
+    const mapScreenEl = document.getElementById('map-screen');
+    if(mapScreenEl) {
+        mapScreenEl.style.position = 'fixed';
+        mapScreenEl.style.height = '100%';
+    }
+    
     // Активация маршрута
     if (houseData.route) {
         const routeEl = document.getElementById(houseData.route);

@@ -16,7 +16,6 @@ body {
     overflow: hidden;
 }
 
-/* --- МЕНЮ --- */
 #menu-screen {
     height: 100%;
     overflow-y: auto;
@@ -42,7 +41,6 @@ body {
     .grid-container { grid-template-columns: 1fr 1fr 1fr; }
 }
 
-/* Карточки */
 .house-card {
     background: white;
     border-radius: 16px;
@@ -51,10 +49,8 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    /* ВАЖНОЕ ИЗМЕНЕНИЕ: Делаем карточку флекс-контейнером */
     display: flex;
     flex-direction: column;
-    height: 100%; /* Растягиваем на всю высоту ячейки сетки */
 }
 .house-card:hover {
     transform: translateY(-5px);
@@ -70,8 +66,6 @@ body {
     background-size: cover;
     background-position: center;
     border-bottom: 1px solid var(--card-border);
-    /* Запрещаем картинке сжиматься */
-    flex-shrink: 0; 
 }
 
 .card-title {
@@ -81,15 +75,12 @@ body {
     font-size: 16px;
     text-align: center;
     background-color: var(--card-footer-bg);
-    
-    /* ВАЖНОЕ ИЗМЕНЕНИЕ: Заставляем заголовок занимать всё оставшееся место */
     flex-grow: 1; 
     display: flex;
-    align-items: center;     /* Центрируем текст по вертикали */
-    justify-content: center; /* Центрируем текст по горизонтали */
+    align-items: center;
+    justify-content: center;
 }
 
-/* --- КАРТА --- */
 #map-screen {
     display: none;
     position: fixed;
@@ -124,7 +115,6 @@ body {
 }
 .back-btn:hover { background-color: #f1f1f1; }
 
-/* Кнопка звонка */
 .call-btn {
     position: fixed;
     bottom: 25px;
@@ -146,10 +136,6 @@ body {
 }
 .call-btn:active { transform: scale(0.9); }
 
-@media (min-width: 768px) {
-    .call-btn { display: none; }
-}
-
 .location-btn {
     position: fixed;
     bottom: 30px;
@@ -169,6 +155,12 @@ body {
 }
 .location-btn:hover { background-color: #1f6696; }
 .location-btn:active { transform: translateX(-50%) scale(0.95); }
+
+/* --- ВАЖНОЕ: Скрываем кнопки на ПК (экраны шире 768px) --- */
+@media (min-width: 768px) {
+    .call-btn { display: none; }
+    .location-btn { display: none; } /* <-- Добавлено скрытие кнопки GPS */
+}
 
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
@@ -191,7 +183,6 @@ svg {
     width: auto;
 }
 
-/* --- SVG СТИЛИ --- */
 path[id^="route_"] {
     fill: none;
     stroke: white;

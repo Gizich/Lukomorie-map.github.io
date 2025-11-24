@@ -4,11 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Лукоморье Навигация</title>
-    <link rel="stylesheet" href="css/style.css?v=3">
+    
+    <link rel="stylesheet" href="css/style.css?v=120">
+
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document,'script','https://mc.yandex.ru/metrika/tag.js', 'ym');
+
+        ym(105482624, 'init', {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true,
+            ecommerce:"dataLayer"
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105482624" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <script>
+        function trackEvent(targetName) {
+            if (typeof ym !== 'undefined') {
+                ym(105482624, 'reachGoal', targetName);
+                console.log('Метрика цель:', targetName);
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <a href="tel:+79272368626" class="call-btn" title="Позвонить">📞</a>
+    <a href="tel:+79272368626" class="call-btn" title="Позвонить" onclick="trackEvent('click_call')">📞</a>
 
     <div id="menu-screen">
         <div class="header">
@@ -21,7 +47,7 @@
     <div id="map-screen">
         <button class="back-btn" onclick="showMenu()">← Меню</button>
 
-        <button class="location-btn" onclick="startGeolocationTracking()">
+        <button class="location-btn" onclick="startGeolocationTracking(); trackEvent('click_gps');">
             📍 Где я?
         </button>
 
@@ -54,8 +80,8 @@
         </div>
     </div>
 
-    <script src="js/data.js?v=3"></script>
-    <script src="js/app.js?v=3"></script>
-    <script src="js/geolocation.js?v=3"></script>
+    <script src="js/data.js?v=8"></script>
+    <script src="js/app.js?v=8"></script>
+    <script src="js/geolocation.js?v=8"></script>
 </body>
 </html>
