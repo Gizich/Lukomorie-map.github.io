@@ -119,11 +119,11 @@
         }
 
         /* --- 4. СТИЛИ SVG (Красота маршрутов) --- */
-        path[id^="route_"] {
+       path[id^="route_"] {
             fill: none;
             stroke: white;
             stroke-width: 20;
-            opacity: 0.4;
+            opacity: 0; /* ИСПРАВЛЕНО: Линия теперь полностью невидима по умолчанию */
             stroke-linecap: round;
             transition: opacity 0.3s;
         }
@@ -266,6 +266,7 @@
     </script>
 </body>
 </html>
+
 
 
 
