@@ -5,28 +5,44 @@ const cardsContainer = document.getElementById('cards-container');
 
 // 1. Инициализация (Генерация меню)
 document.addEventListener('DOMContentLoaded', () => {
-    houses.forEach(house => {
+    if (typeof houses === 'undefined') {
+        console.error('Ошибка: Файл data.js не загружен или пуст.');
+        return;
+    }
+
+    // --- ЛОГИКА СОРТИРОВКИ ---
+    // 1. Находим Администрацию
+    const adminHouse = houses.find(h => h.id === 'house_Administracia');
+    
+    // 2. Берем всех остальных
+    let otherHouses = houses.filter(h => h.id !== 'house_Administracia');
+    
+    // 3. Сортируем остальных по алфавиту (по имени)
+    otherHouses.sort((a, b) => a.name.localeCompare(b.name));
+
+    // 4. Собираем новый список: Администрация первая, потом остальные
+    const sortedHouses = [];
+    if (adminHouse) sortedHouses.push(adminHouse);
+    sortedHouses.push(...otherHouses);
+
+    // --- ОТРИСОВКА ---
+    sortedHouses.forEach(house => {
         const card = document.createElement('div');
         card.className = 'house-card';
         const bgStyle = house.img ? `background-image: url('${house.img}')` : 'background-color: #cbd5e1';
 
-        // Создаем карточку
         card.innerHTML = `<div class="card-image" style="${bgStyle}"></div><div class="card-title">${house.name}</div>`;
-        
-        // Вешаем обработчик клика
         card.onclick = () => openMap(house);
-        
         cardsContainer.appendChild(card);
     });
 });
 
-// 2. Простая функция открытия карты (БЕЗ сложной математики)
+// 2. Открытие карты
 function openMap(houseData) {
-    // Переключаем экраны
     menuScreen.style.display = 'none';
     mapScreen.style.display = 'flex';
 
-    // Сброс старых активных классов
+    // Сброс старых классов
     document.querySelectorAll('.active-route').forEach(el => el.classList.remove('active-route'));
     document.querySelectorAll('.active-house').forEach(el => el.classList.remove('active-house'));
 
@@ -40,11 +56,10 @@ function openMap(houseData) {
     const houseEl = document.getElementById(houseData.id);
     if (houseEl) {
         houseEl.classList.add('active-house');
-        
-        // БЕЗОПАСНЫЙ СКРОЛЛ: Просто прокручиваем элемент в видимую область
-        // Это встроенная функция браузера, она не вызывает ошибок
+
+        // Простой безопасный скролл к домику
         setTimeout(() => {
-            houseEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+           houseEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
         }, 100);
     }
 }

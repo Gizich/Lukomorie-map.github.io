@@ -1,10 +1,10 @@
 :root {
-    --primary-color: #16a34a;   /* Зеленый */
-    --accent-color: #ff4757;    /* Красный */
-    --bg-color: #f8f9fa;        /* Фон страницы */
+    --primary-color: #16a34a;
+    --accent-color: #ff4757;
+    --bg-color: #f8f9fa;
     --text-color: #333;
-    --card-border: #cbd5e1;     /* Цвет рамки */
-    --card-footer-bg: #f1f5f9;  /* Фон под текстом */
+    --card-border: #cbd5e1;
+    --card-footer-bg: #f1f5f9;
 }
 
 body {
@@ -51,8 +51,10 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
+    /* ВАЖНОЕ ИЗМЕНЕНИЕ: Делаем карточку флекс-контейнером */
     display: flex;
     flex-direction: column;
+    height: 100%; /* Растягиваем на всю высоту ячейки сетки */
 }
 .house-card:hover {
     transform: translateY(-5px);
@@ -68,6 +70,8 @@ body {
     background-size: cover;
     background-position: center;
     border-bottom: 1px solid var(--card-border);
+    /* Запрещаем картинке сжиматься */
+    flex-shrink: 0; 
 }
 
 .card-title {
@@ -77,6 +81,12 @@ body {
     font-size: 16px;
     text-align: center;
     background-color: var(--card-footer-bg);
+    
+    /* ВАЖНОЕ ИЗМЕНЕНИЕ: Заставляем заголовок занимать всё оставшееся место */
+    flex-grow: 1; 
+    display: flex;
+    align-items: center;     /* Центрируем текст по вертикали */
+    justify-content: center; /* Центрируем текст по горизонтали */
 }
 
 /* --- КАРТА --- */
@@ -136,19 +146,17 @@ body {
 }
 .call-btn:active { transform: scale(0.9); }
 
-/* Скрываем кнопку звонка на ПК */
 @media (min-width: 768px) {
     .call-btn { display: none; }
 }
 
-/* НОВОЕ: Кнопка Геолокации */
 .location-btn {
     position: fixed;
     bottom: 30px;
-    left: 50%; /* Центрируем по горизонтали */
+    left: 50%;
     transform: translateX(-50%);
     z-index: 2001;
-    background: #2980b9; /* Синий цвет */
+    background: #2980b9;
     color: white;
     padding: 12px 20px;
     border-radius: 30px;
@@ -161,7 +169,6 @@ body {
 }
 .location-btn:hover { background-color: #1f6696; }
 .location-btn:active { transform: translateX(-50%) scale(0.95); }
-
 
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
