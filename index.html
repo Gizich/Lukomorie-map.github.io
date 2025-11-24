@@ -187,7 +187,7 @@
         // --- НАСТРОЙКИ (Добавлены новые дома) ---
         const houses = [
             { name: "Емеля", id: "house_Emelia", route: "route_house_Emelia", img: "images/image_Emelia.jpg" },
-            { name: "Соленка", id: "house_Solenka", route: "route_house_Solenka", img: "images/image_Solenka.jpg" },
+            { name: "Соленка", id: "house_Solenka", route: "route_house_Solenka", img: "images/solenka.jpg" },
             { name: "Дюймовочка", id: "house_Duimovochka", route: "route_house_Duimovochka", img: "images/image_Duimovochka.jpg" },
             { name: "Теремок", id: "house_Teremok", route: "route_house_Teremok", img: "images/image_Teremok.jpg" },
             { name: "Садко", id: "house_Sadko", route: "route_house_Sadko", img: "images/image_Sadko.jpg" },
@@ -228,7 +228,6 @@
             // 3. Удаляем слушатели, чтобы функция больше не вызывалась
             mapScreen.removeEventListener('click', enableZoom);
             mapScreen.removeEventListener('wheel', enableZoom); 
-            console.log("Zoom enabled.");
         }
 
 
@@ -239,7 +238,7 @@
             document.querySelectorAll('.active-route').forEach(el => el.classList.remove('active-route'));
             document.querySelectorAll('.active-house').forEach(el => el.classList.remove('active-house'));
 
-            // ДОБАВЛЕНО: Возвращаем жесткую высоту для идеального начального вида
+            // ВОССТАНОВЛЕНИЕ: Жесткая высота для идеального начального вида
             const mapWrapper = document.querySelector('.map-wrapper');
             mapWrapper.style.height = '100vh'; 
             mapWrapper.style.minHeight = '100vh';
@@ -262,6 +261,8 @@
                 // ДОБАВЛЕНО: Прикрепляем слушатели. Первое нажатие/скролл включает зум
                 mapScreen.addEventListener('click', enableZoom, { once: true });
                 mapScreen.addEventListener('wheel', enableZoom, { once: true });
+
+                // УДАЛЕНА ПРОБЛЕМНАЯ ЛОГИКА АВТОМАТИЧЕСКОЙ ПРОКРУТКИ
             }
         }
 
@@ -272,6 +273,7 @@
     </script>
 </body>
 </html>
+
 
 
 
