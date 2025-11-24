@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <a href="tel:+79272368626" class="call-btn" title="Позвонить администратору">📞</a>
+    <a href="tel:+79272368626" class="call-btn" title="Позвонить">📞</a>
 
     <div id="menu-screen">
         <div class="header">
@@ -21,12 +21,18 @@
     <div id="map-screen">
         <button class="back-btn" onclick="showMenu()">← Меню</button>
 
+        <button class="location-btn" onclick="startGeolocationTracking()">
+            📍 Где я?
+        </button>
+
         <div class="map-wrapper">
             <svg width="1392" height="2480" viewBox="0 0 1392 2480" fill="none" xmlns="http://www.w3.org/2000/svg">
                 
                 <image href="map.jpg" x="0" y="0" width="1392" height="2480" />
 
                 <g id="Layer_1">
+                    <circle id="user-location-pin" cx="0" cy="0" r="40" fill="#2980b9" stroke="white" stroke-width="10" opacity="0" style="transition: all 1s ease;" />
+
                     <rect id="house_Administracia" x="1046" y="2200" width="27" height="55" />
                     <rect id="house_Emelia" x="978" y="1460" width="29" height="28" />
                     <rect id="house_Solenka" x="441" y="1690" width="29" height="27" />
@@ -36,13 +42,13 @@
                     <rect id="house_Kaskad" x="924" y="1662" width="20" height="19" />
                     <rect id="house_Plagnii_Kompleks" x="771" y="1884" width="20" height="22" />
 
-                    <path id="route_house_Solenka" d="M1079.5 2227.5V2183L1055.5 2123.5C1052.67 2085.5 1047 2008.4 1047 2004C1047 1999.6 1038.67 1974.17 1034.5 1962L901.5 1936L689 1912L485 1890.5C478.5 1881 466.1 1861.2 468.5 1858C470.9 1854.8 460.5 1809.67 455 1787.5L434 1744.5V1712.5H455" fill="none" />
-                    <path id="route_house_Emelia" d="M1080.5 2229.5V2183C1072.5 2171.33 1056.3 2143.9 1055.5 2127.5C1054.7 2111.1 1048.83 2038.33 1046 2004C1051.83 1993 1065.2 1970.1 1072 1966.5C1078.8 1962.9 1120.17 1831.67 1140 1766.5L1167 1714.5L1175 1656L1153.5 1582L1096 1504L1090 1479L1104.5 1374L1057.5 1365.5L1027.5 1379L989 1412.5L972.5 1463.5L986 1474" fill="none" />
-                    <path id="route_house_Duimovochka" d="M1080.5 2228V2182.5L1052.5 2123V2003L1096.5 1902L1143 1759.5L964 1684.5V1630.5L1008 1582.5L1019 1568L996.5 1549" fill="none" />
-                    <path id="route_house_Teremok" d="M1083 2228V2183.5L1052.5 2120V1997L1145.5 1761.5L964 1687.5V1631.5L988 1604L970.5 1591.5" fill="none" />
-                    <path id="route_house_Sadko" d="M1084 2230.5V2184.5L1051.5 2123V2000L1143 1761.5L967 1686.5V1634.5H959L952.5 1641.5" fill="none" />
-                    <path id="route_house_Kaskad" d="M1084 2227V2181.5L1054.5 2125L1048.5 1999L1142 1763.5L968 1685.5L952.5 1680.5" fill="none" />
-                    <path id="route_house_Plagnii_Kompleks" d="M1085 2228V2180.5L1051.5 2119C1051.5 2081 1051.5 2004 1051.5 2000C1051.5 1996 1038.17 1973.33 1031.5 1962.5L896.5 1935.5L792 1925L777.5 1911.5" fill="none" />
+                    <path id="route_house_Solenka" d="M1079.5 2227.5V2183L1055.5 2123.5C1052.67 2085.5 1047 2008.4 1047 2004C1047 1999.6 1038.67 1974.17 1034.5 1962L901.5 1936L689 1912L485 1890.5C478.5 1881 466.1 1861.2 468.5 1858C470.9 1854.8 460.5 1809.67 455 1787.5L434 1744.5V1712.5H455" />
+                    <path id="route_house_Emelia" d="M1080.5 2229.5V2183C1072.5 2171.33 1056.3 2143.9 1055.5 2127.5C1054.7 2111.1 1048.83 2038.33 1046 2004C1051.83 1993 1065.2 1970.1 1072 1966.5C1078.8 1962.9 1120.17 1831.67 1140 1766.5L1167 1714.5L1175 1656L1153.5 1582L1096 1504L1090 1479L1104.5 1374L1057.5 1365.5L1027.5 1379L989 1412.5L972.5 1463.5L986 1474" />
+                    <path id="route_house_Duimovochka" d="M1080.5 2228V2182.5L1052.5 2123V2003L1096.5 1902L1143 1759.5L964 1684.5V1630.5L1008 1582.5L1019 1568L996.5 1549" />
+                    <path id="route_house_Teremok" d="M1083 2228V2183.5L1052.5 2120V1997L1145.5 1761.5L964 1687.5V1631.5L988 1604L970.5 1591.5" />
+                    <path id="route_house_Sadko" d="M1084 2230.5V2184.5L1051.5 2123V2000L1143 1761.5L967 1686.5V1634.5H959L952.5 1641.5" />
+                    <path id="route_house_Kaskad" d="M1084 2227V2181.5L1054.5 2125L1048.5 1999L1142 1763.5L968 1685.5L952.5 1680.5" />
+                    <path id="route_house_Plagnii_Kompleks" d="M1085 2228V2180.5L1051.5 2119C1051.5 2081 1051.5 2004 1051.5 2000C1051.5 1996 1038.17 1973.33 1031.5 1962.5L896.5 1935.5L792 1925L777.5 1911.5" />
                 </g>
             </svg>
         </div>
@@ -50,5 +56,5 @@
 
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-</body>
+    <script src="js/geolocation.js"></script> </body>
 </html>

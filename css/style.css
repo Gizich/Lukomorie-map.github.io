@@ -38,8 +38,6 @@ body {
     gap: 20px;
     padding-bottom: 100px;
 }
-
-/* Медиа-запрос для ПК: 3 колонки */
 @media (min-width: 768px) {
     .grid-container { grid-template-columns: 1fr 1fr 1fr; }
 }
@@ -138,12 +136,32 @@ body {
 }
 .call-btn:active { transform: scale(0.9); }
 
-/* --- ВАЖНОЕ ИЗМЕНЕНИЕ: Скрываем кнопку на экранах шире 768px (ПК) --- */
+/* Скрываем кнопку звонка на ПК */
 @media (min-width: 768px) {
-    .call-btn {
-        display: none;
-    }
+    .call-btn { display: none; }
 }
+
+/* НОВОЕ: Кнопка Геолокации */
+.location-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translateX(-50%);
+    z-index: 2001;
+    background: #2980b9; /* Синий цвет */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+.location-btn:hover { background-color: #1f6696; }
+.location-btn:active { transform: translateX(-50%) scale(0.95); }
+
 
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
