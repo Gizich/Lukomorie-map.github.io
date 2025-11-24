@@ -1,9 +1,10 @@
 :root {
-    --primary-color: #16a34a;
-    --primary-dark: #15803d;
-    --accent-color: #ff4757;
-    --bg-color: #f8f9fa;
+    --primary-color: #16a34a;   /* Зеленый */
+    --accent-color: #ff4757;    /* Красный */
+    --bg-color: #f8f9fa;        /* Фон страницы */
     --text-color: #333;
+    --card-border: #cbd5e1;     /* Цвет рамки */
+    --card-footer-bg: #f1f5f9;  /* Фон под текстом */
 }
 
 body {
@@ -23,7 +24,7 @@ body {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -34,40 +35,50 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 20px;
     padding-bottom: 100px;
 }
 
-@media (min-width: 600px) {
+/* Медиа-запрос для ПК: 3 колонки */
+@media (min-width: 768px) {
     .grid-container { grid-template-columns: 1fr 1fr 1fr; }
 }
 
+/* Карточки */
 .house-card {
     background: white;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
 }
-.house-card:active { transform: scale(0.96); }
+.house-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+.house-card:active { transform: scale(0.98); }
 
 .card-image {
     width: 100%;
-    aspect-ratio: 4 / 3; 
+    aspect-ratio: 4 / 3;
     background-color: #e2e8f0;
     background-size: cover;
     background-position: center;
+    border-bottom: 1px solid var(--card-border);
 }
 
 .card-title {
-    padding: 12px;
+    padding: 15px;
     font-weight: 600;
     color: var(--text-color);
-    font-size: 15px;
+    font-size: 16px;
     text-align: center;
+    background-color: var(--card-footer-bg);
 }
 
 /* --- КАРТА --- */
@@ -103,7 +114,9 @@ body {
     align-items: center;
     gap: 5px;
 }
+.back-btn:hover { background-color: #f1f1f1; }
 
+/* Кнопка звонка */
 .call-btn {
     position: fixed;
     bottom: 25px;
@@ -120,13 +133,16 @@ body {
     text-decoration: none;
     box-shadow: 0 4px 20px rgba(22, 163, 74, 0.4);
     z-index: 3000;
-    transition: transform 0.2s, background-color 0.2s;
+    transition: transform 0.2s;
     animation: pulse 2s infinite;
 }
+.call-btn:active { transform: scale(0.9); }
 
-.call-btn:active {
-    transform: scale(0.9);
-    background-color: var(--primary-dark);
+/* --- ВАЖНОЕ ИЗМЕНЕНИЕ: Скрываем кнопку на экранах шире 768px (ПК) --- */
+@media (min-width: 768px) {
+    .call-btn {
+        display: none;
+    }
 }
 
 @keyframes pulse {
@@ -141,6 +157,7 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
+    overflow: visible;
 }
 
 svg {
