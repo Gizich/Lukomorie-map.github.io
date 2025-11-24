@@ -56,8 +56,7 @@
 
         .card-image {
             width: 100%;
-            /* ИЗМЕНЕНИЕ: Удалили фиксированную высоту (120px) */
-            /* ИЗМЕНЕНИЕ: Добавили соотношение сторон 4:3 */
+            /* ИСПРАВЛЕНИЕ: Автоматический расчет высоты 4:3 */
             aspect-ratio: 4 / 3; 
             background-color: #e2e8f0;
             background-size: cover;
@@ -75,11 +74,12 @@
         /* --- 3. ЭКРАН КАРТЫ --- */
         #map-screen {
             display: none;
-            position: fixed; /* Держит экран на месте */
+            /* СТАБИЛЬНАЯ ВЕРСИЯ CSS */
+            position: fixed; 
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%; /* Установлен для начального захвата экрана */
+            height: 100%; 
             background: #a8c0b0;
             z-index: 1000;
             justify-content: center;
@@ -88,21 +88,36 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* ... back-btn без изменений ... */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
         .map-wrapper {
-            /* ВОЗВРАЩЕНО: Жесткое выравнивание по высоте экрана */
-            height: 100vh; 
+            /* СТАБИЛЬНАЯ ВЕРСИЯ CSS */
+            height: 100vh;
             width: auto;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            overflow: visible; /* Чтобы избежать конфликта */
         }
 
         svg {
             display: block;
-            height: 100%; /* Наследует 100vh */
+            height: 100%; 
             width: auto;
         }
 
@@ -111,7 +126,7 @@
             fill: none;
             stroke: white;
             stroke-width: 20;
-            opacity: 0;
+            opacity: 0; /* ИСПРАВЛЕНИЕ: Линии полностью невидимы */
             stroke-linecap: round;
             transition: opacity 0.3s;
         }
@@ -121,7 +136,7 @@
             opacity: 1;
             stroke-dasharray: 4000;
             stroke-dashoffset: 4000;
-            animation: drawRoute 12s forwards ease-out;
+            animation: drawRoute 12s forwards ease-out; /* ИСПРАВЛЕНИЕ: Скорость 12 секунд */
             filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
         }
 
@@ -184,7 +199,7 @@
     </div>
 
     <script>
-        // --- НАСТРОЙКИ (Добавлены новые дома) ---
+        // --- НАСТРОЙКИ (Со всеми домиками) ---
         const houses = [
             { name: "Емеля", id: "house_Emelia", route: "route_house_Emelia", img: "images/image_Emelia.jpg" },
             { name: "Соленка", id: "house_Solenka", route: "route_house_Solenka", img: "images/solenka.jpg" },
@@ -193,7 +208,7 @@
             { name: "Садко", id: "house_Sadko", route: "route_house_Sadko", img: "images/image_Sadko.jpg" },
             { name: "Каскад", id: "house_Kaskad", route: "route_house_Kaskad", img: "images/image_Kaskad.jpg" },
             { name: "Пляжный комплекс", id: "house_Plagnii_Kompleks", route: "route_house_Plagnii_Kompleks", img: "images/image_Shater.jpg" },
-            { name: "Администрация", id: "house_Administracia", route: null, img: "images/image_administracia.jpg" } // Нет маршрута
+            { name: "Администрация", id: "house_Administracia", route: null, img: "images/image_administracia.jpg" } 
         ];
 
         // --- ЛОГИКА ---
@@ -212,40 +227,12 @@
             cardsContainer.appendChild(card);
         });
 
-        // НОВАЯ ФУНКЦИЯ: Снимает жесткую привязку к высоте
-        function enableZoom() {
-            const mapWrapper = document.querySelector('.map-wrapper');
-            const mapScreen = document.getElementById('map-screen');
-
-            // 1. Позволяем контейнеру карты расти при зуме
-            mapWrapper.style.height = 'auto';
-            mapWrapper.style.minHeight = 'auto'; 
-            
-            // 2. Позволяем #map-screen скроллиться по всей странице
-            mapScreen.style.position = 'absolute'; // Меняем с 'fixed' на 'absolute'
-            mapScreen.style.height = 'auto'; 
-
-            // 3. Удаляем слушатели, чтобы функция больше не вызывалась
-            mapScreen.removeEventListener('click', enableZoom);
-            mapScreen.removeEventListener('wheel', enableZoom); 
-        }
-
-
         function openMap(houseData) {
             menuScreen.style.display = 'none';
             mapScreen.style.display = 'flex';
 
             document.querySelectorAll('.active-route').forEach(el => el.classList.remove('active-route'));
             document.querySelectorAll('.active-house').forEach(el => el.classList.remove('active-house'));
-
-            // ВОССТАНОВЛЕНИЕ: Жесткая высота для идеального начального вида
-            const mapWrapper = document.querySelector('.map-wrapper');
-            mapWrapper.style.height = '100vh'; 
-            mapWrapper.style.minHeight = '100vh';
-            const mapScreen = document.getElementById('map-screen');
-            mapScreen.style.position = 'fixed'; 
-            mapScreen.style.height = '100%';
-
 
             // Активация маршрута
             if (houseData.route) {
@@ -257,12 +244,22 @@
             const houseEl = document.getElementById(houseData.id);
             if (houseEl) {
                 houseEl.classList.add('active-house');
+                
+                // ВОССТАНОВЛЕНА ЛОГИКА АВТОМАТИЧЕСКОЙ ПРОКРУТКИ
+                setTimeout(() => {
+                    const svgContainer = document.querySelector('.map-wrapper');
+                    const mapSvg = document.querySelector('#map-screen svg');
 
-                // ДОБАВЛЕНО: Прикрепляем слушатели. Первое нажатие/скролл включает зум
-                mapScreen.addEventListener('click', enableZoom, { once: true });
-                mapScreen.addEventListener('wheel', enableZoom, { once: true });
+                    // Расчет координат домика относительно контейнера SVG
+                    const houseRect = houseEl.getBoundingClientRect();
+                    const svgRect = mapSvg.getBoundingClientRect();
+                    
+                    // Центрирование: скроллим контейнер так, чтобы дом оказался посередине экрана
+                    const scrollX = houseRect.left - svgRect.left + (houseRect.width / 2) - (svgContainer.clientWidth / 2);
+                    const scrollY = houseRect.top - svgRect.top + (houseRect.height / 2) - (svgContainer.clientHeight / 2);
 
-                // УДАЛЕНА ПРОБЛЕМНАЯ ЛОГИКА АВТОМАТИЧЕСКОЙ ПРОКРУТКИ
+                    svgContainer.scrollTo({ top: scrollY, left: scrollX, behavior: 'smooth' });
+                }, 100);
             }
         }
 
@@ -273,13 +270,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
