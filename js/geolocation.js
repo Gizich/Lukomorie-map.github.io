@@ -10,7 +10,7 @@ const GPS_CONSTANTS = {
 // 🛠️ КОРРЕКЦИЯ (Сдвигаем точку выше и левее)
 // ==========================================
 const CORRECTION_X = -40;  // Сдвиг влево
-const CORRECTION_Y = -40;  // Сдвиг вверх
+const CORRECTION_Y = -140;  // Сдвиг вверх
 // ==========================================
 
 const mX = (GPS_CONSTANTS.xB - GPS_CONSTANTS.xA) / (GPS_CONSTANTS.LonB - GPS_CONSTANTS.LonA);
