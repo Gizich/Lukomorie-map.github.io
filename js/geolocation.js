@@ -6,17 +6,30 @@ const GPS_CONSTANTS = {
     LatB: 54.827467, LonB: 55.860459
 };
 
+// ==========================================
+// 🛠️ КОРРЕКЦИЯ (Сдвигаем точку выше и левее)
+// ==========================================
+const CORRECTION_X = -40;  // Сдвиг влево
+const CORRECTION_Y = -40;  // Сдвиг вверх
+// ==========================================
+
 const mX = (GPS_CONSTANTS.xB - GPS_CONSTANTS.xA) / (GPS_CONSTANTS.LonB - GPS_CONSTANTS.LonA);
 const mY = (GPS_CONSTANTS.yB - GPS_CONSTANTS.yA) / (GPS_CONSTANTS.LatB - GPS_CONSTANTS.LatA);
 
 let locationPin;
 let isAlertShown = false;
-let watchId = null; // ID процесса слежения
-let cooldownTimer = null; // ID таймера
+let watchId = null;
+let cooldownTimer = null;
 
 function gpsToSvg(lat, lon) {
-    const x = mX * (lon - GPS_CONSTANTS.LonA) + GPS_CONSTANTS.xA;
-    const y = mY * (lat - GPS_CONSTANTS.LatA) + GPS_CONSTANTS.yA;
+    // Базовый расчет
+    let x = mX * (lon - GPS_CONSTANTS.LonA) + GPS_CONSTANTS.xA;
+    let y = mY * (lat - GPS_CONSTANTS.LatA) + GPS_CONSTANTS.yA;
+    
+    // Применяем коррекцию
+    x = x + CORRECTION_X;
+    y = y + CORRECTION_Y;
+    
     return { x, y };
 }
 
@@ -26,7 +39,10 @@ function isOutOfBounds(lat, lon) {
     const minLon = Math.min(GPS_CONSTANTS.LonA, GPS_CONSTANTS.LonB);
     const maxLon = Math.max(GPS_CONSTANTS.LonA, GPS_CONSTANTS.LonB);
 
-    if (lat < minLat || lat > maxLat || lon < minLon || lon > maxLon) {
+    // Добавляем небольшой допуск (buffer), чтобы не ругался на границе
+    const buffer = 0.0005; 
+
+    if (lat < minLat - buffer || lat > maxLat + buffer || lon < minLon - buffer || lon > maxLon + buffer) {
         return true;
     }
     return false;
@@ -39,10 +55,10 @@ function success(pos) {
 
     if (isOutOfBounds(crd.latitude, crd.longitude)) {
         if (!isAlertShown) {
-            alert("Вы находитесь за пределами территории Лукоморья.");
+            // Уведомление убрали, чтобы не раздражало, если человек рядом
+            console.log("Пользователь за пределами карты");
             isAlertShown = true;
         }
-        // Если кнопка доступна (таймер не идет), пишем статус
         if (btn && !btn.disabled) {
              btn.innerText = '📍 Вы далеко';
         }
@@ -58,16 +74,22 @@ function success(pos) {
         locationPin.setAttribute('cy', y);
         locationPin.style.opacity = 1; 
         
-        if (!isOutOfBounds(crd.latitude, crd.longitude)) {
-             locationPin.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-        }
+        // Скроллим к маркеру (убрали проверку границ для скролла, чтобы всегда показывал где мы)
+        locationPin.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
     }
 }
 
 function error(err) {
     console.warn(`GPS ERROR(${err.code}): ${err.message}`);
+    const btn = document.querySelector('.location-btn');
+    
     if (err.code === 1) {
         alert("Доступ к геолокации запрещен.");
+    }
+    
+    if(btn) {
+        btn.innerText = '📍 Где я?';
+        btn.disabled = false;
     }
 }
 
@@ -101,10 +123,8 @@ function startGeolocationTracking() {
         return;
     }
 
-    // --- ВАЖНОЕ ИСПРАВЛЕНИЕ: Сбрасываем флаг уведомления при новом запуске ---
     isAlertShown = false; 
 
-    // Сброс предыдущего поиска
     if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
