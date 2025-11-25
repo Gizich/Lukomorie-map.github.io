@@ -64,7 +64,7 @@ function success(pos) {
         }
     } else {
         if (btn && !btn.disabled) {
-             btn.innerText = '🛰️ Вы найдены!';
+             btn.innerText = '👋 Добро пожаловать!';
         }
     }
 
@@ -139,5 +139,6 @@ function startGeolocationTracking() {
     });
 
 }
+
 
 
